@@ -1,4 +1,5 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
+from gensim import corpora, models
 import numpy as np
 import jieba
 import matplotlib.pyplot as plt
@@ -71,13 +72,22 @@ def show_tf_idf(tfidf_matrix, vocab):
     plt.title("tfidf可视化")
     plt.show()
 
-if __name__ == "__main__":
-    x_train = [
-        "it is a good day, I like to stay here",
-        "I am happy to be here",
-        "I am bob",
-        "it is sunny today",
-        "I have a party today",
-    ]
-    name, score = tf_idf(x_train, return_tfidf=True)
-    print(name, score)
+def LDA(text, stopwords):
+    # 导入停用词
+    docs = []
+    for c in text:
+        docs_word = jieba.lcut(c)
+        content = docs_word.copy()
+        for i in range(len(docs_word)):
+            if docs_word[i] in stopwords:
+                content.remove(docs_word[i])
+        docs.append(content)
+
+    # Dictionary() 方法遍历所有的文本，为每个不重复的单词分配一个单独的整数 ID，同时收集该单词出现次数以及相关的统计信息
+    dictionary = corpora.Dictionary(docs)
+    # 将标记化文档转换为文档术语矩阵
+    corpus = [dictionary.doc2bow(text) for text in docs]
+    # 构建lda模型
+    lda = models.ldamodel.LdaModel(corpus, num_topics=2, id2word=dictionary, passes=20)
+    theme = lda.print_topics(num_topics=2, num_words=3)
+    return theme

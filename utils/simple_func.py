@@ -22,3 +22,14 @@ def list_to_str(data):
         result.append("".join(c))
     result = np.array(result)
     return result
+
+def get_stopwords_list(path):
+    '''
+    # 导入停用词
+    :param path: 停用词表的路径
+    :return: 停用词列表
+    '''
+    stop_words = []
+    with open(path, "r", encoding="utf-8") as fp:
+        stop_words.extend(fp.read().split("\n"))
+    return stop_words
